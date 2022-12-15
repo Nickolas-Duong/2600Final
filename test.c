@@ -80,12 +80,12 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 
     if(ai == false && player == false)
     {
-        if(*curmsg == 'ai')
+        if(*curmsg == "ai")
         {
             printf("\nGame set to Player VS AI...\n");
             ai = true;
         }
-        else if (*curmsg == 'player')
+        else if (*curmsg == "player")
         {
             printf("\nGame set to Player VS Player");
             player = true;
