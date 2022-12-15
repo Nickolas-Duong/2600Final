@@ -18,6 +18,7 @@ int count = 0;
 bool ai = false;
 bool player = false;
 volatile MQTTClient_deliveryToken deliveredtoken;
+MQTTClient client;
 
 void showGameboard()
 {
@@ -43,18 +44,187 @@ void showGameboard()
 
 void checkWin()
 {
+    int count = 0;
+    for(int i = 0; i < 9; i++)
+    {
+        if(gameBoard[i] == 'X' || gameBoard[i] == 'O')
+        {
+            count++;
+        }
+    }
 
+    if(gameBoard[0] == gameBoard[1] && gameBoard[0] == gameBoard[2])
+    {
+        if (gameBoard[0] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[3] == gameBoard[4] && gameBoard[3] == gameBoard[5])
+    {
+        if (gameBoard[3] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[6] == gameBoard[7] && gameBoard[6] == gameBoard[8])
+    {
+        if (gameBoard[6] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    if(gameBoard[0] == gameBoard[3] && gameBoard[0] == gameBoard[6])
+    {
+        if (gameBoard[0] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[1] == gameBoard[4] && gameBoard[1] == gameBoard[7])
+    {
+        if (gameBoard[1] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[2] == gameBoard[5] && gameBoard[2] == gameBoard[8])
+    {
+        if (gameBoard[2] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[0] == gameBoard[4] && gameBoard[0] == gameBoard[8])
+    {
+        if (gameBoard[0] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
+    else if(gameBoard[6] == gameBoard[4] && gameBoard[6] == gameBoard[2])
+    {
+        if (gameBoard[6] == 'X')
+        {
+            printf("Player X wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+        else
+        {
+            printf("Player O wins\n");
+            for(int i = 0; i < 9; i++)
+            {
+                gameBoard[i] = i+0;
+            }
+        }
+    }
 }
 
 void aiTurn()
 {
     int temp;
+    char *sInt;
+    MQTTClient_deliveryToken token;
+    MQTTClient_message pubmsg = MQTTClient_message_initializer;
     srand(time(0));
     do
     {
         temp = rand() % 9;
+        *sInt = temp+0;
+        pubmsg.payload = sInt;
+        pubmsg.payloadlen = strlen(sInt)+1;
+        pubmsg.qos = QOS;
+        pubmsg.retained = 0;
         if(gameBoard[temp] != 'X' && gameBoard[temp] != 'O')
         {
+            MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
             gameBoard[temp] = 'O';
             count = 0;
         }
@@ -67,6 +237,7 @@ void delivered(void *context, MQTTClient_deliveryToken dt)
     printf("Message with token value %d delivery confirmed\n", dt);
     deliveredtoken = dt;
 }
+
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
 {
     int i;
@@ -235,7 +406,6 @@ void connlost(void *context, char *cause)
 
 int main(int argc, char* argv[])
 {
-    MQTTClient client;
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     int rc;
     int ch;
