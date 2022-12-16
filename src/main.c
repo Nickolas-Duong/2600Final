@@ -227,7 +227,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 
     if (*curmsg == '0')
     {
-        printf("Quitting...");
+        printf("\nQuitting...\n");
         quit = true;
     }
 
@@ -369,7 +369,10 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
         printf("\nIt is not your turn...\n");
     }
     putchar('\n');
-    showGameboard();
+    if (quit == false)
+    {
+        showGameboard();
+    }
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
@@ -398,7 +401,7 @@ int main(int argc, char* argv[])
     }
     printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n\n", TOPIC, CLIENTID, QOS);
     MQTTClient_subscribe(client, TOPIC, QOS);
-    while (quit != true)
+    while (quit != true);
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
     return rc;
