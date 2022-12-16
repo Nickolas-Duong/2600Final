@@ -1,0 +1,67 @@
+3/usr/bin/makepp all
+VERSION2.0.98.55.34.0x86_64-linux-gnu-thread-multi
+DEBUG0
+LOAD564dc1524040Makefile564dc0d48240/home/krievoblast/Desktop/hwtwo/2600Final564dc0d48240
+TRY564dc1524040
+USEdefault rule
+DEPEND564dc1524040
+UP_TO_DATE564dc1524040
+IFEQWindows_NT/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:3
+SHELLuname -s/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:8
+IFEQNAME_SDarwin/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:9
+LOAD_INCL564dc153a180makepp_builtin_rules.mk564dc0b266e0/usr/share/makepp564dc1524040
+LOAD_END564dc1524040
+TRY564dc1521168all564dc0d48240
+USE/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:16
+SCAN_INFO564dc1521168
+LEX_RULE564dc1521168info not cached
+PARSEgcc -o bin/main src/main.c -lpaho-mqtt3c564dc0d48240/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:16
+TRY564dc15bb600gcc564dc15bb528/usr/bin
+USEdefault rule
+DEPEND564dc15bb600
+UP_TO_DATE564dc15bb600
+TRY564dc15174f0main.c564dc1548a28/home/krievoblast/Desktop/hwtwo/2600Final/src
+LOAD_DEFAULT564dc1548a28
+LOAD_INCL564dc153a180564dc15ad7c8makepp_default_makefile.mk564dc0b266e0
+LOAD_END564dc15ad7c8
+USEdefault rule
+DEPEND564dc15174f0
+UP_TO_DATE564dc15174f0
+INCL564dc15174f0564dc159cf48stdio.h564dc1569bc8/usr/include
+TRY564dc159cf48
+USEdefault rule
+DEPEND564dc159cf48
+UP_TO_DATE564dc159cf48
+INCL564dc15174f0564dc15ef680stdlib.h564dc1569bc8
+TRY564dc15ef680
+USEdefault rule
+DEPEND564dc15ef680
+UP_TO_DATE564dc15ef680
+INCL564dc15174f0564dc1610fa0string.h564dc1569bc8
+TRY564dc1610fa0
+USEdefault rule
+DEPEND564dc1610fa0
+UP_TO_DATE564dc1610fa0
+INCL564dc15174f0564dc0b0be20time.h564dc1569bc8
+TRY564dc0b0be20
+USEdefault rule
+DEPEND564dc0b0be20
+UP_TO_DATE564dc0b0be20
+INCL564dc15174f0564dc0b0b760MQTTClient.h564dc1569bc8
+TRY564dc0b0b760
+USEdefault rule
+DEPEND564dc0b0b760
+UP_TO_DATE564dc0b0b760
+DEPEND564dc1521168564dc15c4f70main564dc1553a80/home/krievoblast/Desktop/hwtwo/2600Final/bin564dc0b0b760564dc15bb600564dc15174f0564dc159cf48564dc15ef680564dc1610fa0564dc0b0be20
+BUILD_NONE564dc1521168
+SUCCESS/home/krievoblast/Desktop/hwtwo/2600Final/Makefile:16564dc1521168564dc15c4f70
+*** warning: I attempted to build /home/krievoblast/Desktop/hwtwo/2600Final/all,
+  but after successfully executing the commands, the target does not exist.
+  Perhaps it is a phony target?	 If so, the rule defining it should be modified
+  like this:
+    $(phony all): dependencies
+	actions
+
+  or you could also declare it as phony like this:
+    .PHONY: all
+N_FILES110

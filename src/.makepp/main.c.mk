@@ -1,0 +1,6 @@
+C_MD5_SUM=g6Ivn8DWLH2yWPjQq9uZ/g
+SYSTEM_INCLUDES=stdbool.h stdio.h stdlib.h string.h time.h
+SIGNATURE=1671180076,9788
+INCLUDES=MQTTClient.h
+LIBS=
+END=

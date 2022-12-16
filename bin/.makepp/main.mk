@@ -1,0 +1,15 @@
+SORTED_DEPS=/usr/include/MQTTClient.h/usr/bin/gccsrc/main.c/usr/include/stdio.h/usr/include/stdlib.h/usr/include/string.h/usr/include/time.h
+ARCH=x86_64-linux-gnu-thread-multi
+CWD=..
+SIGNATURE=1671180321,21016
+SIG_METHOD_IMPLICIT=1
+DEP_SIGS=1621882434,855741651350594,862976g6Ivn8DWLH2yWPjQq9uZ/g1657149803,311761657149803,363931657149803,194591657149803,14839
+COMMAND=gcc -o bin/main src/main.c -lpaho-mqtt3c
+META_DEPS=/usr/bin/gccsrc/main.csysstdbool.hstdio.hstdlib.hstring.htime.husersrc/MQTTClient.h
+INCLUDE_PATHS=lib/usr/local/lib/usr/lib/libsys/usr/local/include/usr/includeuser/usr/local/include/usr/include
+BUILD_SIGNATURE=1671180321,21016
+IMPLICIT_DEPS=liblibpaho-mqtt3c
+SIG_METHOD_NAME=C
+IMPLICIT_TARGETS=bin/main
+INCLUDE_SFXS=lib.la.so.sa.a.sl
+END=
