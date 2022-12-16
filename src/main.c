@@ -370,11 +370,6 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     }
     putchar('\n');
     showGameboard();
-    if(ai == true && count == 1)
-    {
-        aiTurn();
-        showGameboard();
-    }
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
     return 1;
