@@ -2,11 +2,15 @@
 #include <PubSubClient.h>
 #include <Keypad.h>
 
-#define RED 4
-#define GREEN 2
-#define BLUE 15
-#define YELLOW 5
-
+#define ONE 4
+#define TWO 2
+#define THREE 15
+#define FOUR 5
+#define FIVE 34
+#define SIX 35
+#define SEVEN 32
+#define EIGHT 33
+#define NINE 18
 // define the symbols on the buttons of the keypad
 char keys[4][4] = {
   {'1', '2', '3', 'A'},
@@ -41,10 +45,15 @@ PubSubClient client(espClient);
 
 void setup() {
   //set initial pins
-  pinMode(RED, OUTPUT);
-  pinMode(BLUE, OUTPUT);
-  pinMode(GREEN, OUTPUT);
-  pinMode(YELLOW, OUTPUT);
+  pinMode(ONE, OUTPUT);
+  pinMode(TWO, OUTPUT);
+  pinMode(THREE, OUTPUT);
+  pinMode(FOUR, OUTPUT);
+  pinMode(FIVE, OUTPUT);
+  pinMode(SIX, OUTPUT);
+  pinMode(SEVEN, OUTPUT);
+  pinMode(EIGHT, OUTPUT);
+  pinMode(NINE, OUTPUT);
 
   boardSetup();
  // Set software serial baud to 115200;
@@ -98,7 +107,6 @@ void callback(char *topic, byte *payload, unsigned int length) {
     {
       Serial.print("Already taken by ");
       Serial.print(gameBoard[res.toInt()-1][0]);
-      showUnallow();
     }
     //otherwise allow
     else
@@ -106,7 +114,6 @@ void callback(char *topic, byte *payload, unsigned int length) {
       Serial.print("X at ");
       Serial.print(res);
       gameBoard[res.toInt()-1][0] = 'X';
-      showAllow();
       count++;
     }
   }
@@ -117,14 +124,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
     {
       Serial.print("Already taken by ");
       Serial.print(gameBoard[res.toInt()-1][0]);
-      showUnallow();
     }
     else
     {
       Serial.print("O at ");
       Serial.print(res);
       gameBoard[res.toInt()-1][0] = 'O';
-      showAllow();
       count = 0;
     }
   }
@@ -139,7 +144,6 @@ void callback(char *topic, byte *payload, unsigned int length) {
   else if (res == "Game End" && inPlay == true)
   {
     Serial.print("New Game...");
-    showEnd();
     count = 0;
   }
   //if quit
@@ -218,13 +222,14 @@ void gameCheck()
     }
   }
 
+  //If match is made, state game is won, show end state, reset
   if(gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0])
   {
     Serial.print("Player ");
     Serial.print(gameBoard[0][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
-
+    showEnd(gameBoard[0][0]);
     for(int i = 0; i < 9; i++)
     {
       gameBoard[i][0] = (char) i;
@@ -239,6 +244,7 @@ void gameCheck()
     Serial.print(gameBoard[3][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[3][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -254,6 +260,7 @@ void gameCheck()
     Serial.print(gameBoard[6][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[6][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -269,6 +276,7 @@ void gameCheck()
     Serial.print(gameBoard[0][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[0][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -284,6 +292,7 @@ void gameCheck()
     Serial.print(gameBoard[1][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[1][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -299,6 +308,7 @@ void gameCheck()
     Serial.print(gameBoard[6][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[2][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -314,6 +324,7 @@ void gameCheck()
     Serial.print(gameBoard[0][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[0][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -329,6 +340,7 @@ void gameCheck()
     Serial.print(gameBoard[6][0]);
     Serial.print(" Wins! ");
     Serial.println("Resetting...");
+    showEnd(gameBoard[6][0]);
 
     for(int i = 0; i < 9; i++)
     {
@@ -339,16 +351,17 @@ void gameCheck()
     client.publish(topic, "Game End");
 
   }
+  //show catscratch if no matches
   else if(tempC == 9)
   {
+    showScratch();
+
+    Serial.println("Catscratch... resetting...");
+    client.publish(topic, "Catscratch");
     for(int i = 0; i < 9; i++)
     {
       gameBoard[i][0] = (char) i;
     }
-
-    Serial.println("Catscratch... resetting...");
-    client.publish(topic, "Catscratch");
-
     count = 0;
 
   }
@@ -357,71 +370,275 @@ void gameCheck()
 //set up initial game board
 void boardSetup()
 {
-  showAllow();
-  showUnallow();
-  showScratch();
-  showEnd();
+  //set all lights to off
+  digitalWrite(ONE, LOW);
+  digitalWrite(TWO, LOW);
+  digitalWrite(THREE, LOW);
+  digitalWrite(FOUR, LOW);
+  digitalWrite(FIVE, LOW);
+  digitalWrite(SIX, LOW);
+  digitalWrite(SEVEN, LOW);
+  digitalWrite(EIGHT, LOW);
+  digitalWrite(NINE, LOW);
 
   //initialize board
   for(int i = 0; i < 9; i++)
   {
-    gameBoard[i][0] = (char) i;
+    gameBoard[i][0] = i + 0;
   }
 }
 
 //show game board
 void showBoard()
 {
-  //show board
+  //show board, shine if X, blink if O
   Serial.println("-------");
   Serial.print("|");
   Serial.print(gameBoard[0][0]);
+  if (gameBoard[0][0] == 'X')
+  {
+    digitalWrite(ONE, HIGH);
+  }
+  else if (gameBoard[0][0] == 'O')
+  {
+    digitalWrite(ONE, HIGH);
+    delay(500);
+    digitalWrite(ONE, LOW);
+  }
+  else
+  {
+    digitalWrite(ONE, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[1][0]);
+  if (gameBoard[1][0] == 'X')
+  {
+    digitalWrite(TWO, HIGH);
+  }
+  else if (gameBoard[1][0] == 'O')
+  {
+    digitalWrite(TWO, HIGH);
+    delay(500);
+    digitalWrite(TWO, LOW);
+  }
+  else
+  {
+    digitalWrite(TWO, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[2][0]);
+  if (gameBoard[2][0] == 'X')
+  {
+    digitalWrite(THREE, HIGH);
+  }
+  else if (gameBoard[2][0] == 'O')
+  {
+    digitalWrite(THREE, HIGH);
+    delay(500);
+    digitalWrite(THREE, LOW);
+  }
+  else
+  {
+    digitalWrite(THREE, LOW);
+  }
   Serial.println("|");
   Serial.print("|");
   Serial.print(gameBoard[3][0]);
+  if (gameBoard[3][0] == 'X')
+  {
+    digitalWrite(FOUR, HIGH);
+  }
+  else if (gameBoard[3][0] == 'O')
+  {
+    digitalWrite(FOUR, HIGH);
+    delay(500);
+    digitalWrite(FOUR, LOW);
+  }
+  else
+  {
+    digitalWrite(FOUR, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[4][0]);
+  if (gameBoard[4][0] == 'X')
+  {
+    digitalWrite(FIVE, HIGH);
+  }
+  else if (gameBoard[4][0] == 'O')
+  {
+    digitalWrite(FIVE, HIGH);
+    delay(500);
+    digitalWrite(FIVE, LOW);
+  }
+  else
+  {
+    digitalWrite(FIVE, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[5][0]);
+  if (gameBoard[5][0] == 'X')
+  {
+    digitalWrite(SIX, HIGH);
+  }
+  else if (gameBoard[5][0] == 'O')
+  {
+    digitalWrite(SIX, HIGH);
+    delay(500);
+    digitalWrite(SIX, LOW);
+  }
+  else
+  {
+    digitalWrite(SIX, LOW);
+  }
   Serial.println("|");
   Serial.print("|");
   Serial.print(gameBoard[6][0]);
+  if (gameBoard[6][0] == 'X')
+  {
+    digitalWrite(SEVEN, HIGH);
+  }
+  else if (gameBoard[6][0] == 'O')
+  {
+    digitalWrite(SEVEN, HIGH);
+    delay(500);
+    digitalWrite(SEVEN, LOW);
+  }
+  else
+  {
+    digitalWrite(SEVEN, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[7][0]);
+  if (gameBoard[7][0] == 'X')
+  {
+    digitalWrite(EIGHT, HIGH);
+  }
+  else if (gameBoard[7][0] == 'O')
+  {
+    digitalWrite(EIGHT, HIGH);
+    delay(500);
+    digitalWrite(EIGHT, LOW);
+  }
+  else
+  {
+    digitalWrite(EIGHT, LOW);
+  }
   Serial.print("|");
   Serial.print(gameBoard[8][0]);
+  if (gameBoard[8][0] == 'X')
+  {
+    digitalWrite(NINE, HIGH);
+  }
+  else if (gameBoard[8][0] == 'O')
+  {
+    digitalWrite(NINE, HIGH);
+    delay(500);
+    digitalWrite(NINE, LOW);
+  }
+  else
+  {
+    digitalWrite(NINE, LOW);
+  }
   Serial.println("|");
   Serial.println("-------");
 }
 
-void showAllow()
+//Show end of game via LEDs
+void showEnd(char letter)
 {
-  digitalWrite(GREEN, HIGH);
-  delay(500);
-  digitalWrite(GREEN, LOW);
+  //If X, show in X shape, otherwise O shape
+  if (letter == 'X')
+  {
+    digitalWrite(ONE, HIGH);
+    digitalWrite(THREE, HIGH);
+    digitalWrite(FIVE, HIGH);
+    digitalWrite(SEVEN, HIGH);
+    digitalWrite(NINE, HIGH);
+    delay(500);
+    digitalWrite(ONE, LOW);
+    digitalWrite(THREE, LOW);
+    digitalWrite(FIVE, LOW);
+    digitalWrite(SEVEN, LOW);
+    digitalWrite(NINE, LOW);
+    delay(500);
+    digitalWrite(ONE, HIGH);
+    digitalWrite(THREE, HIGH);
+    digitalWrite(FIVE, HIGH);
+    digitalWrite(SEVEN, HIGH);
+    digitalWrite(NINE, HIGH);
+    delay(500);
+    digitalWrite(ONE, LOW);
+    digitalWrite(THREE, LOW);
+    digitalWrite(FIVE, LOW);
+    digitalWrite(SEVEN, LOW);
+    digitalWrite(NINE, LOW);
+  }
+  else
+  {
+    digitalWrite(TWO, HIGH);
+    digitalWrite(FOUR, HIGH);
+    digitalWrite(SIX, HIGH);
+    digitalWrite(EIGHT, HIGH);
+    delay(500);
+    digitalWrite(TWO, LOW);
+    digitalWrite(FOUR, LOW);
+    digitalWrite(SIX, LOW);
+    digitalWrite(EIGHT, LOW);
+    delay(500);
+    digitalWrite(TWO, HIGH);
+    digitalWrite(FOUR, HIGH);
+    digitalWrite(SIX, HIGH);
+    digitalWrite(EIGHT, HIGH);
+    delay(500);
+    digitalWrite(TWO, LOW);
+    digitalWrite(FOUR, LOW);
+    digitalWrite(SIX, LOW);
+    digitalWrite(EIGHT, LOW);
+    delay(500);
+  }
 }
 
-void showUnallow()
-{
-  digitalWrite(RED, HIGH);
-  delay(500);
-  digitalWrite(RED, LOW);
-}
-
-void showEnd()
-{
-  digitalWrite(BLUE, HIGH);
-  delay(500);
-  digitalWrite(BLUE, LOW);
-}
-
+//Show scratch via LED
 void showScratch()
 {
-  digitalWrite(YELLOW, HIGH);
+  //Blink all LEDs twice
+  digitalWrite(ONE, HIGH);
+  digitalWrite(TWO, HIGH);
+  digitalWrite(THREE, HIGH);
+  digitalWrite(FOUR, HIGH);
+  digitalWrite(FIVE, HIGH);
+  digitalWrite(SIX, HIGH);
+  digitalWrite(SEVEN, HIGH);
+  digitalWrite(EIGHT, HIGH);
+  digitalWrite(NINE, HIGH);
   delay(500);
-  digitalWrite(YELLOW, LOW);
+  digitalWrite(ONE, LOW);
+  digitalWrite(TWO, LOW);
+  digitalWrite(THREE, LOW);
+  digitalWrite(FOUR, LOW);
+  digitalWrite(FIVE, LOW);
+  digitalWrite(SIX, LOW);
+  digitalWrite(SEVEN, LOW);
+  digitalWrite(EIGHT, LOW);
+  digitalWrite(NINE, LOW);
+  delay(500);
+  digitalWrite(ONE, HIGH);
+  digitalWrite(TWO, HIGH);
+  digitalWrite(THREE, HIGH);
+  digitalWrite(FOUR, HIGH);
+  digitalWrite(FIVE, HIGH);
+  digitalWrite(SIX, HIGH);
+  digitalWrite(SEVEN, HIGH);
+  digitalWrite(EIGHT, HIGH);
+  digitalWrite(NINE, HIGH);
+  delay(500);
+  digitalWrite(ONE, LOW);
+  digitalWrite(TWO, LOW);
+  digitalWrite(THREE, LOW);
+  digitalWrite(FOUR, LOW);
+  digitalWrite(FIVE, LOW);
+  digitalWrite(SIX, LOW);
+  digitalWrite(SEVEN, LOW);
+  digitalWrite(EIGHT, LOW);
+  digitalWrite(NINE, LOW);
 }
