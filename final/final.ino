@@ -40,6 +40,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup() {
+  //set initial pins
   pinMode(RED, OUTPUT);
   pinMode(BLUE, OUTPUT);
   pinMode(GREEN, OUTPUT);
@@ -83,19 +84,23 @@ void callback(char *topic, byte *payload, unsigned int length) {
     res += (char) payload[i];
   }
   // Serial.println(res);
+  //if quit is selected
   if (res == "0")
   {
     inPlay = false;
   }
 
+  //if the game is not a catscratch or game end
   if(count == 0 && res != "Catscratch" && count == 0 && res != "Game End" && inPlay == true)
   {
+    //prevent if already taken
     if(gameBoard[res.toInt()-1][0] == 'X' || gameBoard[res.toInt()-1][0] == 'O')
     {
       Serial.print("Already taken by ");
       Serial.print(gameBoard[res.toInt()-1][0]);
       showUnallow();
     }
+    //otherwise allow
     else
     {
       Serial.print("X at ");
@@ -105,6 +110,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
       count++;
     }
   }
+  //repeat for player 2
   else if (count == 1 && res != "Catscratch" && count == 1 && res != "Game End" && inPlay == true)
   {
     if(gameBoard[res.toInt()-1][0] == 'X' || gameBoard[res.toInt()-1][0] == 'O')
@@ -122,18 +128,21 @@ void callback(char *topic, byte *payload, unsigned int length) {
       count = 0;
     }
   }
+  //if scratch
   else if (res == "Catscratch" && inPlay == true)
   {
     Serial.print("New Game...");
     showScratch();
     count = 0;
   }
+  //if game end
   else if (res == "Game End" && inPlay == true)
   {
     Serial.print("New Game...");
     showEnd();
     count = 0;
   }
+  //if quit
   else if (inPlay != true)
   {
     Serial.print("Someone has quit... game has ended...");
@@ -145,7 +154,9 @@ void callback(char *topic, byte *payload, unsigned int length) {
 }
 
 void loop() {
+  //get keypad input
   char keyPressed = myKeypad.getKey();
+  //if game is in play, get input and publish
   if (count == 0 && inPlay == true)
   {
     if (keyPressed == '1')
@@ -193,9 +204,12 @@ void loop() {
  client.loop();
 }
 
+//check game state
 void gameCheck()
 {
-  int tempC = 0;  
+  int tempC = 0;
+
+  //see if all spots are taken  
   for(int i = 0; i < 9; i++)
   {
     if(gameBoard[i][0] == 'X' || gameBoard[i][0] == 'O')
@@ -204,156 +218,161 @@ void gameCheck()
     }
   }
 
-    if(tempC == 9)
+  if(gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[0][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-
-      Serial.println("Catscratch... resetting...");
-      client.publish(topic, "Catscratch");
-
-      count = 0;
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[0][0] == gameBoard[1][0] && gameBoard[0][0] == gameBoard[2][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[3][0] == gameBoard[4][0] && gameBoard[3][0] == gameBoard[5][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[3][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[0][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[3][0] == gameBoard[4][0] && gameBoard[3][0] == gameBoard[5][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[6][0] == gameBoard[7][0] && gameBoard[6][0] == gameBoard[8][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[6][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[3][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[6][0] == gameBoard[7][0] && gameBoard[6][0] == gameBoard[8][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[0][0] == gameBoard[3][0] && gameBoard[0][0] == gameBoard[6][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[0][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[6][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[0][0] == gameBoard[3][0] && gameBoard[0][0] == gameBoard[6][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[1][0] == gameBoard[4][0] && gameBoard[1][0] == gameBoard[7][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[1][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[0][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[1][0] == gameBoard[4][0] && gameBoard[1][0] == gameBoard[7][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[2][0] == gameBoard[5][0] && gameBoard[2][0] == gameBoard[8][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[6][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[1][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[2][0] == gameBoard[5][0] && gameBoard[2][0] == gameBoard[8][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[0][0] == gameBoard[4][0] && gameBoard[0][0] == gameBoard[8][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[0][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[6][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[0][0] == gameBoard[4][0] && gameBoard[0][0] == gameBoard[8][0])
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(gameBoard[6][0] == gameBoard[4][0] && gameBoard[6][0] == gameBoard[2][0])
+  {
+    Serial.print("Player ");
+    Serial.print(gameBoard[6][0]);
+    Serial.print(" Wins! ");
+    Serial.println("Resetting...");
+
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[0][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
-    else if(gameBoard[6][0] == gameBoard[4][0] && gameBoard[6][0] == gameBoard[2][0])
+
+    count = 0;
+    client.publish(topic, "Game End");
+
+  }
+  else if(tempC == 9)
+  {
+    for(int i = 0; i < 9; i++)
     {
-      Serial.print("Player ");
-      Serial.print(gameBoard[6][0]);
-      Serial.print(" Wins! ");
-      Serial.println("Resetting...");
-
-      for(int i = 0; i < 9; i++)
-      {
-        gameBoard[i][0] = (char) i;
-      }
-
-      count = 0;
-      client.publish(topic, "Game End");
-
+      gameBoard[i][0] = (char) i;
     }
+
+    Serial.println("Catscratch... resetting...");
+    client.publish(topic, "Catscratch");
+
+    count = 0;
+
+  }
 }
 
+//set up initial game board
 void boardSetup()
 {
   showAllow();
   showUnallow();
   showScratch();
   showEnd();
+
+  //initialize board
   for(int i = 0; i < 9; i++)
   {
     gameBoard[i][0] = (char) i;
   }
 }
 
+//show game board
 void showBoard()
 {
+  //show board
   Serial.println("-------");
   Serial.print("|");
   Serial.print(gameBoard[0][0]);
