@@ -211,6 +211,14 @@ void checkWin()
             }
         }
     }
+    if(count == 9)
+    {
+        printf("Catscratch... game over...");
+        for (int i = 0; i < 9; i++)
+        {
+            gameBoard[i] = i+0;
+        }
+    }
 }
 
 //if message published
