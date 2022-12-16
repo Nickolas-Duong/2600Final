@@ -17,6 +17,7 @@ char gameBoard[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 int count = 0;
 bool ai = false;
 bool player = false;
+bool quit = false;
 volatile MQTTClient_deliveryToken deliveredtoken;
 MQTTClient client;
 
@@ -207,31 +208,7 @@ void checkWin()
     }
 }
 
-void aiTurn()
-{
-    int temp;
-    char *sInt;
-    MQTTClient_deliveryToken token;
-    MQTTClient_message pubmsg = MQTTClient_message_initializer;
-    srand(time(0));
-    do
-    {
-        temp = rand() % 9;
-        *sInt = temp+0;
-        pubmsg.payload = sInt;
-        pubmsg.payloadlen = strlen(sInt)+1;
-        pubmsg.qos = QOS;
-        pubmsg.retained = 0;
-        if(gameBoard[temp] != 'X' && gameBoard[temp] != 'O')
-        {
-            MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
-            gameBoard[temp] = 'O';
-            count = 0;
-        }
-    } while (count == 1);
-    
 
-}
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
     printf("Message with token value %d delivery confirmed\n", dt);
@@ -245,9 +222,14 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     printf("Message arrived\n");
     printf("     topic: %s\n", topicName);
     printf("   message: ");
-    payloadptr = message->payload;
     curmsg = message->payload;
     printf("%s", curmsg);
+
+    if (*curmsg == '0')
+    {
+        printf("Quitting...");
+        quit = true;
+    }
 
     if(ai == false && player == false)
     {
@@ -419,13 +401,9 @@ int main(int argc, char* argv[])
         printf("Failed to connect, return code %d\n", rc);
         exit(EXIT_FAILURE);
     }
-    printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n"
-           "Press Q<Enter> to quit\n\n", TOPIC, CLIENTID, QOS);
+    printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n\n", TOPIC, CLIENTID, QOS);
     MQTTClient_subscribe(client, TOPIC, QOS);
-    do
-    {
-        ch = getchar();
-    } while(ch!='Q' && ch != 'q');
+    while (quit != true)
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
     return rc;
